@@ -55,6 +55,12 @@ mqttc.on_connect = on_connect
 mqttc.on_publish = on_publish
 mqttc.on_subscribe = on_subscribe
 
+friendlyNames = {
+	"FD31DA50": "side_shed",
+	"DED3F59D": "shed",
+	"DF9928DF": "garden"
+}
+
 
 def main( configfile='homie-bluetooth.json' ):
 	# Read config
@@ -78,8 +84,8 @@ def main( configfile='homie-bluetooth.json' ):
 	
 	# Set MQTT credentials, open connection and start background network loop
 	print "Connecting to {0}:{1}".format( MOSQUITTO_HOST, MOSQUITTO_PORT )
-	mqttc.username_pw_set( MOSQUITTO_USER, MOSQUITTO_PWD )
-	mqttc.tls_set( ca_certs=config["MQTT"]["TLS_CERT"] )
+	# mqttc.username_pw_set( MOSQUITTO_USER, MOSQUITTO_PWD )
+	# mqttc.tls_set( ca_certs=config["MQTT"]["TLS_CERT"] )
 	mqttc.connect( MOSQUITTO_HOST, MOSQUITTO_PORT, MOSQUITTO_KEEPALIVE )
 	mqttc.loop_start()
 
@@ -96,7 +102,7 @@ def main( configfile='homie-bluetooth.json' ):
 
 	while True:
 		try:
-			returnedList = bluemaestroscan.parse_events( sock, 10 )
+			returnedList = bluemaestroscan.parse_events( sock )
 			currentdatetime = time.strftime( "%Y-%m-%dT%H:%M:%S" )	# 2019-06-25T23:59:00
 			print('Date Time:   {0}'.format( currentdatetime ))
 			print "number of beacons found {0}".format(len(returnedList))
@@ -104,17 +110,23 @@ def main( configfile='homie-bluetooth.json' ):
 			for beacon in returnedList:
 				# Publish to the MQTT channel
 				try:
+					mac = beacon["name"]
+					name = friendlyNames[beacon["name"]]
 					temp = float( beacon["temp"] )
 					humidity = float( beacon["humidity"] )
 					dewpoint = beacon["dewpoint"]
-					battery = beacon["battery"]
+					battery = "{:.2f}".format(beacon["battery"])
 
-					print "Temp: {0} C, humidity: {1}%, dewpoint: {2} C, battery: {3}%".format( temp, humidity, dewpoint, battery )
-					mqttc.publish( config["topics"]["temp"], temp )
-					mqttc.publish( config["topics"]["humidity"], humidity )
-					mqttc.publish( config["topics"]["dewpoint"], dewpoint )
-					mqttc.publish( config["topics"]["battery"], battery )
-					mqttc.publish( config["topics"]["timestamp"], currentdatetime )
+					print "Mac: {0}, Name: {1}, Temp: {2} C, humidity: {3}%, dewpoint: {4} C, battery: {5}%".format( mac, name, temp, humidity, dewpoint, battery )
+
+					mqttc.publish( "/bluemaestro/{0}".format(name), json.dumps({
+						"name": name,
+						"temp": temp,
+						"humidity": humidity,
+						"dewpoint": dewpoint,
+						"battery": battery,
+						"timestamp": currentdatetime
+					}) )
 
 				except Exception,e:
 					# Null out the worksheet so a login is performed at the top of the loop.
