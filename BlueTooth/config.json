@@ -1,1 +1,20 @@
-{        "MQTT": {                "HOST": "",                "PORT": 1883,                "KEEPALIVE": 10,                "USERNAME": "",                "PASSWORD": ""        },        "bluetooth": {                "frequency": 1,                "log": "ble-log.txt"        }}
+{
+	"MQTT": {
+		"HOST": "192.168.0.170",
+		"PORT": 1883,
+		"KEEPALIVE": 10,
+		"USERNAME": "",
+		"PASSWORD": ""
+	},
+	"topics": {
+		"temp": "/bluemaestro/temp",
+		"humidity": "/bluemaestro/humidity",
+		"dewpoint": "/bluemaestro/dewpoint",
+		"battery": "/bluemaestro/battery",
+		"timestamp": "bluemaestro/timestamp"
+	},
+	"bluetooth": {
+		"frequency": 1,
+		"log": "ble-log.txt"
+	}
+}

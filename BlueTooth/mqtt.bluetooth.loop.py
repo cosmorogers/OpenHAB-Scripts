@@ -58,7 +58,8 @@ mqttc.on_subscribe = on_subscribe
 friendlyNames = {
 	"FD31DA50": "side_shed",
 	"DED3F59D": "shed",
-	"DF9928DF": "garden"
+	"DF9928DF": "garden",
+    "E3020F4B": "network_cabinet"
 }
 
 

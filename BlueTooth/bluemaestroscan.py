@@ -54,6 +54,12 @@ ADV_SCAN_IND=0x02
 ADV_NONCONN_IND=0x03
 ADV_SCAN_RSP=0x04
 
+def twos_comp(val, bits):
+    """compute the 2's complement of int value val"""
+    if (val & (1 << (bits - 1))) != 0: # if sign bit is set e.g., 8bit: 128-255
+        val = val - (1 << bits)        # compute negative value
+    return val                         # return positive value as is
+
 
 def returnnumberpacket(pkt):
     myInteger = 0
@@ -174,9 +180,11 @@ def parse_events(sock, loop_count=100):
 			  sensor["mac"] = mac
 #			  print "\tMAC Address string: ", returnstringpacket(pkt[report_pkt_offset + 3:report_pkt_offset + 9])
 			  tempString = returnstringpacket(pkt[report_pkt_offset + 23: report_pkt_offset + 25])
-#			  print "\tTemp: " , tempString 
-			  temp = float(returnnumberpacket(pkt[report_pkt_offset + 23:report_pkt_offset + 25]))/10
-#			  print "\tTemp: " , temp
+			  print "\tTemp string: " , tempString
+              temp = float(twos_comp(int(tempString,16), 16))/10
+              #print "\tTwos temp: ", twosCompTemp
+			  #temp = float(returnnumberpacket(pkt[report_pkt_offset + 23:report_pkt_offset + 25]))/10
+			  #print "\tTemp: " , temp
 			  sensor["temp"] = temp
 
 #			  print "\tHumidity: " ,printpacket(pkt[report_pkt_offset + 25:report_pkt_offset + 27])
@@ -185,8 +193,11 @@ def parse_events(sock, loop_count=100):
 			  sensor["humidity"] = humidity 
 
 
-			  dewpoint = float(returnnumberpacket(pkt[report_pkt_offset + 27:report_pkt_offset + 29]))/10
-#			  print "\tDewpoint: " ,dewpoint 
+			  #dewpoint = float(returnnumberpacket(pkt[report_pkt_offset + 27:report_pkt_offset + 29]))/10
+              dewpointString = returnstringpacket(pkt[report_pkt_offset + 27:report_pkt_offset + 29])
+              #print "\tDewpoint string: ", dewpointString
+			  dewpoint = float(twos_comp(int(dewpointString, 16), 16))/10
+			  #print "\tDewpoint: " ,dewpoint
 			  sensor["dewpoint"] = dewpoint
 
 			  nameLength = int(returnstringpacket(pkt[report_pkt_offset + 32]))

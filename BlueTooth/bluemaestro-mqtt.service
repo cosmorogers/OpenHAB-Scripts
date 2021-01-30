@@ -4,7 +4,7 @@ After=multi-user.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python /home/openhabian/OpenHAB-Scripts/BlueTooth/mqtt.bluetooth.loop.py -c /home/openhabian/OpenHAB-Scripts/BlueTooth/config.json
+ExecStart=/usr/bin/python /home/pi/OpenHAB-Scripts-master/BlueTooth/mqtt.bluetooth.loop.py -c /home/pi/OpenHAB-Scripts-master/BlueTooth/config.json
 Restart=on-abort
 
 [Install]
